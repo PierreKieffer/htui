@@ -23,13 +23,13 @@ func (screen *BaseScreen) Update() {
 
 	if d == nil {
 
-		ls.SetRect(0, 5, 25, y)
+		ls.SetRect(0, 10, x, y)
 		termui.Render(ls)
 
 	} else {
 
-		ls.SetRect(0, 5, 25, y)
-		d.SetRect(25, 5, x, y)
+		ls.SetRect(0, 10, 40, y)
+		d.SetRect(40, 10, x, y)
 
 		termui.Render(ls, d)
 	}
@@ -44,13 +44,13 @@ func (screen *BaseScreen) Create() {
 	}
 
 	if screen.UIList == nil {
-		screen.Screen = "apps"
-		screen.UIList = AppList()
+		screen.Screen = "home"
+		screen.UIList = HomeList()
 	}
 
 	// header
 	h := screen.Header
-	h.SetRect(0, 0, x, 5)
+	h.SetRect(0, 0, x, 10)
 
 	// menu list
 	ls := screen.UIList
@@ -58,10 +58,10 @@ func (screen *BaseScreen) Create() {
 	ls.WrapText = false
 
 	if screen.Display == nil {
-		ls.SetRect(0, 5, x, y)
+		ls.SetRect(0, 10, x, y)
 
 	} else {
-		ls.SetRect(0, 5, 25, y)
+		ls.SetRect(0, 10, 40, y)
 
 	}
 
@@ -74,24 +74,42 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 	switch selectedItem {
 	case " ---- Home ---- ":
-		items := AppList()
-		screen.Screen = "apps"
+		/*
+			Return to Home page
+		*/
+		items := HomeList()
+		screen.Screen = "home"
 		screen.UIList = items
 		screen.Previous = nil
 		screen.Display = nil
 
 	case "<---- Return":
+		/*
+			Point to screen.Previous address
+		*/
 		*screen = *screen.Previous
 
+	/*
+		Apps
+	*/
+	case "Apps":
+		var previousScreen BaseScreen
+		previousScreen = *screen
+
+		items := AppList()
+		screen.Screen = "apps"
+		screen.UIList = items
+		screen.Previous = &previousScreen
+		screen.Display = nil
+
 	case "App info":
+		var previousScreen BaseScreen
+		previousScreen = *screen
+
 		screen.Display = AppInfo(screen.UIList.Title)
 		screen.Screen = "appInfo"
 		screen.Display.Title = "App info"
-
-	case "Dyno info":
-		screen.Display = DynoInfo(screen.UIList.Title, selectedItem)
-		screen.Screen = "dynoInfo"
-		screen.Display.Title = "Dyno info"
+		screen.Previous = &previousScreen
 
 	case "Dynos":
 		var previousScreen BaseScreen
@@ -102,6 +120,17 @@ func (screen *BaseScreen) HandleSelectItem() {
 		screen.UIList = items
 		screen.Display = nil
 		screen.Previous = &previousScreen
+		// case "Logs":
+		// var previousScreen BaseScreen
+		// previousScreen = *screen
+
+	/*
+		Dynos
+	*/
+	case "Dyno info":
+		screen.Display = DynoInfo(screen.UIList.Title)
+		screen.Screen = "dynoInfo"
+		screen.Display.Title = "Dyno info"
 
 	default:
 		var previousScreen BaseScreen
@@ -115,7 +144,7 @@ func (screen *BaseScreen) HandleSelectItem() {
 			screen.Previous = &previousScreen
 
 		case "dynos":
-			items := DynoOptions(screen.UIList.Title)
+			items := DynoOptions(screen.UIList.Title, selectedItem)
 			screen.Screen = "dynoOptions"
 			screen.UIList = items
 			screen.Previous = &previousScreen

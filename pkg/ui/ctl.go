@@ -7,13 +7,28 @@ import (
 	termui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"os"
+	"strings"
 )
 
 func BuildHeader() *widgets.Paragraph {
 	header := widgets.NewParagraph()
-	header.Text = "input text"
+	header.Text = `
+  _   _        _ 
+ | |_| |_ _  _(_)
+ | ' \  _| || | |
+ |_||_\__|\_,_|_|
+
+ Heroku Terminal User Interface
+`
 
 	return header
+}
+
+func HomeList() *widgets.List {
+	options := widgets.NewList()
+	options.Title = "Home"
+	options.Rows = []string{"Apps", "Addons", "Help"}
+	return options
 }
 
 func AppList() *widgets.List {
@@ -43,10 +58,10 @@ func AppOptions(appName string) *widgets.List {
 	return options
 }
 
-func DynoOptions(appName string) *widgets.List {
+func DynoOptions(appName string, dynoName string) *widgets.List {
 	options := widgets.NewList()
-	options.Title = appName
-	options.Rows = []string{"Dyno info", "Create", "Restart", "Stop"}
+	options.Title = fmt.Sprintf("%v / %v", appName, dynoName)
+	options.Rows = []string{"Dyno info", "Restart", "Stop"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
 	return options
@@ -64,11 +79,6 @@ func AppDynos(appName string) *widgets.List {
 
 	for _, dyno := range dynos {
 		dynosList.Rows = append(dynosList.Rows, dyno.Name)
-	}
-
-	if len(dynos) < 1 {
-		options := []string{"create"}
-		dynosList.Rows = append(dynosList.Rows, options...)
 	}
 
 	utils := []string{"<---- Return", " ---- Home ---- "}
@@ -105,12 +115,17 @@ func AppInfo(appName string) *widgets.Paragraph {
 	}
 
 	infoScreen.Text = info
-	infoScreen.SetRect(25, 5, x, y)
+	infoScreen.SetRect(40, 5, x, y)
 
 	return infoScreen
 }
 
-func DynoInfo(appName string, dynoName string) *widgets.Paragraph {
+func DynoInfo(selectedDyno string) *widgets.Paragraph {
+
+	selectedDynoSplit := strings.Split(selectedDyno, " / ")
+
+	appName := selectedDynoSplit[0]
+	dynoName := selectedDynoSplit[1]
 
 	x, y := termui.TerminalDimensions()
 
@@ -124,7 +139,7 @@ func DynoInfo(appName string, dynoName string) *widgets.Paragraph {
 	}
 
 	for _, dyno := range dynos {
-		if dyno.Name == appName {
+		if dyno.Name == dynoName {
 			jsonInfo, err := json.MarshalIndent(dyno, "", "    ")
 			if err != nil {
 				fmt.Println(err)
@@ -136,7 +151,7 @@ func DynoInfo(appName string, dynoName string) *widgets.Paragraph {
 	}
 
 	infoScreen.Text = info
-	infoScreen.SetRect(25, 5, x, y)
+	infoScreen.SetRect(40, 5, x, y)
 
 	return infoScreen
 }
