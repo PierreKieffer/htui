@@ -34,7 +34,7 @@ func HomeList() *widgets.List {
 func AppList() *widgets.List {
 
 	appList := widgets.NewList()
-	appList.Title = "apps"
+	appList.Title = "Apps"
 
 	apps, err := core.GetApps()
 	if err != nil {
@@ -45,6 +45,9 @@ func AppList() *widgets.List {
 	for _, app := range apps {
 		appList.Rows = append(appList.Rows, app.Name)
 	}
+
+	utils := []string{"<---- Return", " ---- Home ---- "}
+	appList.Rows = append(appList.Rows, utils...)
 
 	return appList
 }
