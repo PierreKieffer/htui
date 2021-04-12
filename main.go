@@ -16,6 +16,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// ctx := context.Background()
 	ui.App()
+
 }

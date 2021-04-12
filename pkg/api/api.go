@@ -83,7 +83,7 @@ func PostRequest(endpoint string, payload string) (*Response, error) {
 	return &response, nil
 }
 
-func StreamRequest(endpoint string) error {
+func StreamRequest(endpoint string, buffer chan string, apiSignal chan bool) error {
 	/*
 		http get request with output stream
 	*/
@@ -103,12 +103,22 @@ func StreamRequest(endpoint string) error {
 
 	reader := bufio.NewReader(resp.Body)
 
+	go func() {
+		select {
+		case <-apiSignal:
+			fmt.Println("end of StreamRequest")
+			resp.Body.Close()
+		}
+	}()
+
 	for {
 		line, err := reader.ReadBytes('\n')
+
 		if err != nil {
 			return errors.New(fmt.Sprintf("ERROR : StreamRequest : %v", err.Error()))
 		}
-		fmt.Println(string(line))
+
+		buffer <- string(line)
 	}
 }
 

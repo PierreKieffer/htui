@@ -1,18 +1,30 @@
 package ui
 
 import (
+	"fmt"
 	termui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"log"
+	"time"
 )
 
 type BaseScreen struct {
-	Screen   string
-	Header   *widgets.Paragraph
-	UIList   *widgets.List
-	Display  *widgets.Paragraph
+	Screen  string
+	Header  *widgets.Paragraph
+	UIList  *widgets.List
+	Display *widgets.Paragraph
+
 	Previous *BaseScreen
 }
+
+type CacheStorage struct {
+	AppName    string
+	LogsBuffer chan string
+}
+
+var cache *CacheStorage
+
+var signal = make(chan bool)
 
 func (screen *BaseScreen) Update() {
 
@@ -26,12 +38,27 @@ func (screen *BaseScreen) Update() {
 		ls.SetRect(0, 10, x, y)
 		termui.Render(ls)
 
+		switch screen.Screen {
+		case "appLogs":
+
+			go AppLogs(screen, cache, signal)
+
+			go func() {
+				for screen.Screen == "appLogs" {
+					fmt.Println(len(screen.UIList.Rows), screen.UIList.SelectedRow)
+					termui.Render(ls)
+					time.Sleep(1 * time.Second)
+				}
+			}()
+		}
+
 	} else {
 
 		ls.SetRect(0, 10, 40, y)
 		d.SetRect(40, 10, x, y)
 
 		termui.Render(ls, d)
+
 	}
 }
 
@@ -54,7 +81,9 @@ func (screen *BaseScreen) Create() {
 
 	// menu list
 	ls := screen.UIList
-	ls.TextStyle = termui.NewStyle(termui.ColorYellow)
+	// ls.TextStyle = termui.NewStyle(termui.ColorYellow)
+	ls.SelectedRowStyle = termui.NewStyle(termui.ColorMagenta)
+	ls.TitleStyle.Fg = termui.ColorYellow
 	ls.WrapText = false
 
 	if screen.Display == nil {
@@ -72,11 +101,17 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 	selectedItem := screen.UIList.Rows[screen.UIList.SelectedRow]
 
+	if screen.Screen == "appLogs" {
+		signal <- true
+		selectedItem = " ---- Home ---- "
+	}
+
 	switch selectedItem {
 	case " ---- Home ---- ":
 		/*
 			Return to Home page
 		*/
+
 		items := HomeList()
 		screen.Screen = "home"
 		screen.UIList = items
@@ -87,6 +122,7 @@ func (screen *BaseScreen) HandleSelectItem() {
 		/*
 			Point to screen.Previous address
 		*/
+
 		*screen = *screen.Previous
 
 	/*
@@ -111,6 +147,22 @@ func (screen *BaseScreen) HandleSelectItem() {
 		screen.Display.Title = "App info"
 		screen.Previous = &previousScreen
 
+	case "Logs":
+		var previousScreen BaseScreen
+		previousScreen = *screen
+
+		var logsBuffer = make(chan string)
+
+		cache.LogsBuffer = logsBuffer
+		cache.AppName = screen.UIList.Title
+
+		screen.Screen = "appLogs"
+
+		screen.UIList.Rows = []string{}
+		screen.UIList.Title = fmt.Sprintf("%v - %v", cache.AppName, "Logs | Press enter to return")
+
+		screen.Previous = &previousScreen
+
 	case "Dynos":
 		var previousScreen BaseScreen
 		previousScreen = *screen
@@ -120,9 +172,6 @@ func (screen *BaseScreen) HandleSelectItem() {
 		screen.UIList = items
 		screen.Display = nil
 		screen.Previous = &previousScreen
-		// case "Logs":
-		// var previousScreen BaseScreen
-		// previousScreen = *screen
 
 	/*
 		Dynos
@@ -148,6 +197,7 @@ func (screen *BaseScreen) HandleSelectItem() {
 			screen.Screen = "dynoOptions"
 			screen.UIList = items
 			screen.Previous = &previousScreen
+
 		}
 
 	}
@@ -163,6 +213,10 @@ func App() {
 		log.Fatalf("failed to initialize termui: %v", err)
 	}
 	defer termui.Close()
+
+	if cache == nil {
+		cache = &CacheStorage{}
+	}
 
 	baseScreen.Create()
 

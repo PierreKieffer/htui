@@ -12,6 +12,7 @@ import (
 
 func BuildHeader() *widgets.Paragraph {
 	header := widgets.NewParagraph()
+	// header.TextStyle.Fg = termui.ColorMagenta
 	header.Text = `
   _   _        _ 
  | |_| |_ _  _(_)
@@ -157,6 +158,26 @@ func DynoInfo(selectedDyno string) *widgets.Paragraph {
 	infoScreen.SetRect(40, 5, x, y)
 
 	return infoScreen
+}
+
+func AppLogs(screen *BaseScreen, cache *CacheStorage, signal chan bool) {
+
+	var streamSignal = make(chan bool)
+
+	// x, y := termui.TerminalDimensions()
+
+	go core.StreamLogs(cache.AppName, cache.LogsBuffer, streamSignal)
+
+	for {
+		select {
+		case <-signal:
+			streamSignal <- true
+
+		case log := <-cache.LogsBuffer:
+			screen.UIList.Rows = append(screen.UIList.Rows, log)
+		}
+	}
+
 }
 
 func AppNodes() []*widgets.TreeNode {
