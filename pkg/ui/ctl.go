@@ -6,7 +6,9 @@ import (
 	"github.com/PierreKieffer/htui/pkg/pkg/core"
 	termui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
+	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -50,12 +52,26 @@ func AppList() *widgets.List {
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	appList.Rows = append(appList.Rows, utils...)
 
+	///////// DEMO
+	// demo_slice := []string{"db-system-api-production", "db-system-api-staging", "load-balancer-production", "load-balancer-staging", "sync-worker-production", "sync-worker-staging"}
+	// appList.Rows = demo_slice
+	// appList.Rows = append(appList.Rows, utils...)
+	///////// DEMO
+
 	return appList
 }
 
-func AppOptions(appName string) *widgets.List {
+func AppOptions(appName string, withoutReturn ...bool) *widgets.List {
 	options := widgets.NewList()
 	options.Title = appName
+
+	if len(withoutReturn) > 0 {
+		options.Rows = []string{"App info", "Dynos", "Logs"}
+		utils := []string{" ---- Home ---- "}
+		options.Rows = append(options.Rows, utils...)
+		return options
+	}
+
 	options.Rows = []string{"App info", "Dynos", "Logs"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
@@ -174,7 +190,21 @@ func AppLogs(screen *BaseScreen, cache *CacheStorage, signal chan bool) {
 			streamSignal <- true
 
 		case log := <-cache.LogsBuffer:
-			screen.UIList.Rows = append(screen.UIList.Rows, log)
+
+			logs := append(cache.Logs, strconv.Itoa(rand.Intn(100)))
+			logs = append(logs, log)
+			cache.Logs = logs
+
+			// screen.UIList.Rows = []string{strconv.Itoa(rand.Intn(100))}
+			// screen.UIList.Rows = logs
+
+			// if len(screen.UIList.Rows) >= 200 {
+
+			// screen.UIList.Rows = screen.UIList.Rows[1:]
+			// screen.UIList.Rows = append(screen.UIList.Rows, log)
+
+			// } else {
+			// }
 		}
 	}
 

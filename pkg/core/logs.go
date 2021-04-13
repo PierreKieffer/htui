@@ -12,7 +12,7 @@ func StreamLogs(appName string, logsBuffer chan string, signal chan bool) error 
 
 	var apiSignal = make(chan bool)
 
-	payload := `{"dyno" : "", "lines" : 300, "source" : "app", "tail" : true}`
+	payload := `{"dyno" : "", "lines" : 500, "source" : "app", "tail" : true}`
 
 	logSessionUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/log-sessions", appName)
 
@@ -33,7 +33,6 @@ func StreamLogs(appName string, logsBuffer chan string, signal chan bool) error 
 	select {
 	case <-signal:
 		apiSignal <- true
-		fmt.Println("end of StreamLogs")
 		return nil
 	}
 

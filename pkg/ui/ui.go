@@ -5,6 +5,7 @@ import (
 	termui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,7 @@ type BaseScreen struct {
 type CacheStorage struct {
 	AppName    string
 	LogsBuffer chan string
+	Logs       []string
 }
 
 var cache *CacheStorage
@@ -45,7 +47,9 @@ func (screen *BaseScreen) Update() {
 
 			go func() {
 				for screen.Screen == "appLogs" {
-					fmt.Println(len(screen.UIList.Rows), screen.UIList.SelectedRow)
+					// fmt.Println(len(screen.UIList.Rows), screen.UIList.SelectedRow)
+					ls.Rows = cache.Logs
+
 					termui.Render(ls)
 					time.Sleep(1 * time.Second)
 				}
@@ -99,12 +103,20 @@ func (screen *BaseScreen) Create() {
 
 func (screen *BaseScreen) HandleSelectItem() {
 
-	selectedItem := screen.UIList.Rows[screen.UIList.SelectedRow]
+	var selectedItem string
 
 	if screen.Screen == "appLogs" {
+
 		signal <- true
-		selectedItem = " ---- Home ---- "
+
+		items := AppOptions(strings.Split(screen.UIList.Title, " - ")[0], true)
+		screen.Screen = "appOptions"
+		screen.UIList = items
+		screen.Previous = nil
+		return
 	}
+
+	selectedItem = screen.UIList.Rows[screen.UIList.SelectedRow]
 
 	switch selectedItem {
 	case " ---- Home ---- ":
@@ -160,6 +172,7 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 		screen.UIList.Rows = []string{}
 		screen.UIList.Title = fmt.Sprintf("%v - %v", cache.AppName, "Logs | Press enter to return")
+		screen.Display = nil
 
 		screen.Previous = &previousScreen
 

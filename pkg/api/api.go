@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type Response struct {
@@ -106,7 +107,6 @@ func StreamRequest(endpoint string, buffer chan string, apiSignal chan bool) err
 	go func() {
 		select {
 		case <-apiSignal:
-			fmt.Println("end of StreamRequest")
 			resp.Body.Close()
 		}
 	}()
@@ -118,7 +118,7 @@ func StreamRequest(endpoint string, buffer chan string, apiSignal chan bool) err
 			return errors.New(fmt.Sprintf("ERROR : StreamRequest : %v", err.Error()))
 		}
 
-		buffer <- string(line)
+		buffer <- strings.Split(string(line), " ")[0]
 	}
 }
 
