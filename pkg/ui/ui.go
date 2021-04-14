@@ -21,7 +21,6 @@ type BaseScreen struct {
 type CacheStorage struct {
 	AppName    string
 	LogsBuffer chan string
-	Logs       []string
 }
 
 var cache *CacheStorage
@@ -47,9 +46,6 @@ func (screen *BaseScreen) Update() {
 
 			go func() {
 				for screen.Screen == "appLogs" {
-					// fmt.Println(len(screen.UIList.Rows), screen.UIList.SelectedRow)
-					ls.Rows = cache.Logs
-
 					termui.Render(ls)
 					time.Sleep(1 * time.Second)
 				}

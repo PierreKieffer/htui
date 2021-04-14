@@ -6,9 +6,7 @@ import (
 	"github.com/PierreKieffer/htui/pkg/pkg/core"
 	termui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
-	"math/rand"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -191,20 +189,28 @@ func AppLogs(screen *BaseScreen, cache *CacheStorage, signal chan bool) {
 
 		case log := <-cache.LogsBuffer:
 
-			logs := append(cache.Logs, strconv.Itoa(rand.Intn(100)))
-			logs = append(logs, log)
-			cache.Logs = logs
+			log = strings.Replace(log, "\n", "", -1)
 
-			// screen.UIList.Rows = []string{strconv.Itoa(rand.Intn(100))}
-			// screen.UIList.Rows = logs
+			// Split log to handle max lenght of log line
+			screenMaxSize := screen.UIList.Rectangle.Max.X - 5
 
-			// if len(screen.UIList.Rows) >= 200 {
+			if len(log) >= screenMaxSize {
+				for len(log) >= screenMaxSize {
+					if log[:1] == " " {
+						log = log[1:]
+					}
+					subLog := log[:screenMaxSize]
+					log = log[screenMaxSize:]
+					screen.UIList.Rows = append(screen.UIList.Rows, subLog)
+				}
 
-			// screen.UIList.Rows = screen.UIList.Rows[1:]
-			// screen.UIList.Rows = append(screen.UIList.Rows, log)
+				screen.UIList.Rows = append(screen.UIList.Rows, log)
 
-			// } else {
-			// }
+			} else {
+				screen.UIList.Rows = append(screen.UIList.Rows, log)
+
+			}
+
 		}
 	}
 
