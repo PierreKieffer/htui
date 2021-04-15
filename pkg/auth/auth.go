@@ -11,24 +11,41 @@ import (
 
 func Auth() error {
 
+	authInstruction := `
+
+	 - htui Authentication - 
+
+	Welcome to htui, the Heroku Terminal User Interface. 
+
+	htui uses API token mechanism for authentication to Heroku, with HEROKU_API_KEY environment variable.
+
+	If ~/.netrc file exists (UNIX), HEROKU_API_KEY is set automatically.
+
+	If ~/.netrc doesn't exist, you need to set HEROKU_API_KEY manually : 
+	- Retrieve the API token : 
+		- heroku CLI : heroku auth:token
+		- heroku account setting web page : API Key
+	- export HEROKU_API_KEY="api token" 
+	`
+
 	if os.Getenv("HEROKU_API_KEY") == "" {
 
 		home, err := os.UserHomeDir()
 
 		if err != nil {
-			return errors.New(fmt.Sprintf("ERROR : Auth : %v", err.Error()))
+			return errors.New(fmt.Sprintf("ERROR : Auth : %v %v", err.Error(), authInstruction))
 		}
 
 		netrc := fmt.Sprintf("%v/.netrc", home)
 
 		_, err = os.Stat(netrc)
 		if err != nil {
-			return errors.New(fmt.Sprintf("ERROR : Auth : %v", err.Error()))
+			return errors.New(fmt.Sprintf("ERROR : Auth : %v %v", err.Error(), authInstruction))
 		}
 
 		token, err := ExtractHerokuToken(netrc)
 		if err != nil {
-			return errors.New(fmt.Sprintf("ERROR : Auth : %v", err.Error()))
+			return errors.New(fmt.Sprintf("ERROR : Auth : %v %v", err.Error(), authInstruction))
 		}
 
 		os.Setenv("HEROKU_API_KEY", token)
