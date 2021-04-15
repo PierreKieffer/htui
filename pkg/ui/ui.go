@@ -5,6 +5,7 @@ import (
 	termui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"log"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -244,6 +245,15 @@ func (screen *BaseScreen) HandleSelectItem() {
 			screen.Screen = "formationOptions"
 			screen.UIList = items
 			screen.Previous = &previousScreen
+
+		case "scaleFormation":
+			quantity, _ := strconv.Atoi(selectedItem)
+			screen.Display = UpdateFormation(screen.UIList.Title, quantity)
+			screen.Display.Title = fmt.Sprintf("%v : Scale to %v", screen.UIList.Title, selectedItem)
+			screen.UIList.Rows = []string{"<---- Return", " ---- Home ---- "}
+			screen.UIList.ScrollTop()
+
+			screen.Previous.Display = nil
 
 		}
 

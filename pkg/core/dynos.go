@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/PierreKieffer/htui/pkg/pkg/api"
@@ -102,6 +103,30 @@ func GetFormationInfo(appName string, formationType string) (Formation, error) {
 	}
 
 	return formation, errors.New(fmt.Sprintf("ERROR : GetFormationInfo : status code %v", resp.StatusCode))
+}
+
+func UpdateFormation(appName string, formationType string, quantity int) (string, error) {
+
+	updateFormationUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/formation", appName)
+
+	payload := fmt.Sprintf(`{"updates" : [{"quantity" : %v,"type" : "%v"}]}`, quantity, formationType)
+
+	resp, err := api.PatchRequest(updateFormationUrl, payload)
+
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("ERROR : UpdateFormation : %v", err.Error()))
+	}
+
+	if resp.StatusCode != 200 {
+		return fmt.Sprintf("ERROR : UpdateFormation : %v, %v", resp.StatusCode, resp.Body.(map[string]interface{})), nil
+	}
+
+	responsePayload, err := json.MarshalIndent(resp.Body.([]interface{}), "", "    ")
+	if err != nil {
+		return "", errors.New(fmt.Sprintf("ERROR : UpdateFormation : %v", err.Error()))
+	}
+
+	return string(responsePayload), nil
 
 }
 

@@ -82,6 +82,41 @@ func PostRequest(endpoint string, payload string) (*Response, error) {
 
 	return &response, nil
 }
+func PatchRequest(endpoint string, payload string) (*Response, error) {
+	/*
+		http patch request wrapper
+	*/
+
+	var response Response
+
+	client := &http.Client{}
+
+	req, err := http.NewRequest("PATCH", endpoint, bytes.NewBuffer([]byte(payload)))
+
+	if err != nil {
+		return &response, errors.New(fmt.Sprintf("ERROR : PatchRequest : %v", err.Error()))
+	}
+
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Content-Type", "application/json")
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return &response, errors.New(fmt.Sprintf("ERROR : PatchRequest : %v", err.Error()))
+	}
+
+	var body interface{}
+
+	json.NewDecoder(resp.Body).Decode(&body)
+
+	response.StatusCode = resp.StatusCode
+	response.Body = body
+
+	return &response, nil
+}
 
 func DeleteRequest(endpoint string) (*Response, error) {
 	/*

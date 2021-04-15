@@ -107,6 +107,31 @@ func FormationOptions(appName string, formationType string) *widgets.List {
 	return options
 }
 
+func UpdateFormation(selectedFormation string, quantity int) *widgets.Paragraph {
+
+	selectedFormationSplit := strings.Split(selectedFormation, " / ")
+
+	appName := selectedFormationSplit[0]
+	formationType := selectedFormationSplit[1]
+
+	x, y := termui.TerminalDimensions()
+
+	infoScreen := widgets.NewParagraph()
+
+	formationUpdateResp, err := core.UpdateFormation(appName, formationType, quantity)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	infoScreen.Text = string(formationUpdateResp)
+
+	infoScreen.SetRect(40, 5, x, y)
+
+	return infoScreen
+
+}
+
 func FormationInfo(selectedFormation string) *widgets.Paragraph {
 
 	selectedFormationSplit := strings.Split(selectedFormation, " / ")
@@ -138,6 +163,7 @@ func FormationInfo(selectedFormation string) *widgets.Paragraph {
 
 func FormationScalingOptions(selectedFormation string) *widgets.List {
 	options := widgets.NewList()
+	options.Title = selectedFormation
 	options.Rows = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
