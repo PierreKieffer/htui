@@ -17,6 +17,94 @@ type Dyno struct {
 	Type      string `json:"type"`
 }
 
+type Formation struct {
+	Id        string  `json:"id"`
+	CreatedAt string  `json:"created_at"`
+	UpdatedAt string  `json:"updatedAt"`
+	Command   string  `json:"command"`
+	Size      string  `json:"size"`
+	Quantity  float64 `json:"quantity"`
+	Type      string  `json:"type"`
+	App       struct {
+		Name string `json:"name"`
+		Id   string `json:"id"`
+	} `json:"app"`
+}
+
+func GetAppFormation(appName string) ([]Formation, error) {
+	/*
+	 */
+	var formations []Formation
+
+	dynosListUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/formation", appName)
+
+	resp, err := api.GetRequest(dynosListUrl)
+
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("ERROR : GetAppFormation : %v", err.Error()))
+	}
+
+	if resp.StatusCode == 200 {
+
+		for _, rawItem := range resp.Body.([]interface{}) {
+			item := rawItem.(map[string]interface{})
+			formation := Formation{
+				Id:        ParseItem(item["id"]),
+				CreatedAt: ParseItem(item["created_at"]),
+				UpdatedAt: ParseItem(item["updated_at"]),
+				Command:   ParseItem(item["command"]),
+				Size:      ParseItem(item["size"]),
+				Quantity:  item["quantity"].(float64),
+				Type:      ParseItem(item["type"]),
+			}
+
+			formation.App.Name = ParseItem(item["app"].(map[string]interface{})["name"])
+			formation.App.Id = ParseItem(item["app"].(map[string]interface{})["id"])
+
+			formations = append(formations, formation)
+
+		}
+
+		return formations, nil
+	}
+
+	return formations, errors.New(fmt.Sprintf("ERROR : GetAppFormation : status code %v", resp.StatusCode))
+}
+
+func GetFormationInfo(appName string, formationType string) (Formation, error) {
+	var formation Formation
+
+	formationUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/formation/%v", appName, formationType)
+
+	resp, err := api.GetRequest(formationUrl)
+
+	if err != nil {
+		return formation, errors.New(fmt.Sprintf("ERROR : GetFormationInfo : %v", err.Error()))
+	}
+
+	if resp.StatusCode == 200 {
+
+		item := resp.Body.(map[string]interface{})
+		formation := Formation{
+			Id:        ParseItem(item["id"]),
+			CreatedAt: ParseItem(item["created_at"]),
+			UpdatedAt: ParseItem(item["updated_at"]),
+			Command:   ParseItem(item["command"]),
+			Size:      ParseItem(item["size"]),
+			Quantity:  item["quantity"].(float64),
+			Type:      ParseItem(item["type"]),
+		}
+
+		formation.App.Name = ParseItem(item["app"].(map[string]interface{})["name"])
+		formation.App.Id = ParseItem(item["app"].(map[string]interface{})["id"])
+
+		return formation, nil
+	}
+
+	return formation, errors.New(fmt.Sprintf("ERROR : GetFormationInfo : status code %v", resp.StatusCode))
+
+}
+
 func GetAppDynos(appName string) ([]Dyno, error) {
 	/*
 	 */
@@ -110,7 +198,7 @@ func GetDynoInfo(appName string, dynoName string) (Dyno, error) {
 
 func GetDynoState(appName string, dynoName string) (string, error) {
 
-	dyno, err := core.GetDynoInfo(appName, dynoName)
+	dyno, err := GetDynoInfo(appName, dynoName)
 	if err != nil {
 		return "", errors.New(fmt.Sprintf("ERROR : GetDynoState : %v", err.Error()))
 	}

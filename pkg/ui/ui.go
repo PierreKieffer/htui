@@ -205,23 +205,23 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 		screen.Previous = &previousScreen
 
-	case "Dynos":
+	/*
+		Dynos
+	*/
+	case "Dynos formation":
 		var previousScreen BaseScreen
 		previousScreen = *screen
 
-		items := AppDynos(screen.UIList.Title)
-		screen.Screen = "dynos"
+		items := AppFormation(screen.UIList.Title)
+		screen.Screen = "formation"
 		screen.UIList = items
 		screen.Display = nil
 		screen.Previous = &previousScreen
 
-	/*
-		Dynos
-	*/
-	case "Dyno info":
-		screen.Display = DynoInfo(screen.UIList.Title)
-		screen.Screen = "dynoInfo"
-		screen.Display.Title = "Dyno info"
+	case "Dynos formation info":
+		screen.Display = FormationInfo(screen.UIList.Title)
+		screen.Screen = "formationInfo"
+		screen.Display.Title = "Dynos formation info"
 
 	case "Restart":
 		dynoState, display := RestartSelectedDyno(screen.UIList.Title)
@@ -245,9 +245,9 @@ func (screen *BaseScreen) HandleSelectItem() {
 			screen.UIList = items
 			screen.Previous = &previousScreen
 
-		case "dynos":
-			items := DynoOptions(screen.UIList.Title, selectedItem)
-			screen.Screen = "dynoOptions"
+		case "formation":
+			items := FormationOptions(screen.UIList.Title, selectedItem)
+			screen.Screen = "formationOptions"
 			screen.UIList = items
 			screen.Previous = &previousScreen
 

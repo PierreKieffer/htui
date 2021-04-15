@@ -64,16 +64,77 @@ func AppOptions(appName string, withoutReturn ...bool) *widgets.List {
 	options.Title = appName
 
 	if len(withoutReturn) > 0 {
-		options.Rows = []string{"App info", "Dynos", "Logs"}
+		options.Rows = []string{"App info", "Dynos formation", "Logs"}
 		utils := []string{" ---- Home ---- "}
 		options.Rows = append(options.Rows, utils...)
 		return options
 	}
 
-	options.Rows = []string{"App info", "Dynos", "Logs"}
+	options.Rows = []string{"App info", "Dynos formation", "Logs"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
 	return options
+}
+
+func AppFormation(appName string) *widgets.List {
+	formationList := widgets.NewList()
+
+	formationList.Title = appName
+
+	appFormations, err := core.GetAppFormation(appName)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	for _, appFormation := range appFormations {
+		formationList.Rows = append(formationList.Rows, appFormation.Type)
+	}
+
+	utils := []string{"<---- Return", " ---- Home ---- "}
+
+	formationList.Rows = append(formationList.Rows, utils...)
+
+	return formationList
+}
+
+func FormationOptions(appName string, formationType string) *widgets.List {
+	options := widgets.NewList()
+	options.Title = fmt.Sprintf("%v / %v", appName, formationType)
+	options.Rows = []string{"Dynos formation info", "Scale"}
+	utils := []string{"<---- Return", " ---- Home ---- "}
+	options.Rows = append(options.Rows, utils...)
+	return options
+}
+
+func FormationInfo(selectedFormation string) *widgets.Paragraph {
+
+	selectedFormationSplit := strings.Split(selectedFormation, " / ")
+
+	appName := selectedFormationSplit[0]
+	formationType := selectedFormationSplit[1]
+
+	x, y := termui.TerminalDimensions()
+
+	infoScreen := widgets.NewParagraph()
+
+	appFormation, err := core.GetFormationInfo(appName, formationType)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	jsonInfo, err := json.MarshalIndent(appFormation, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	infoScreen.Text = string(jsonInfo)
+
+	infoScreen.SetRect(40, 5, x, y)
+
+	return infoScreen
+
 }
 
 func DynoOptions(appName string, dynoName string) *widgets.List {
