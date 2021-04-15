@@ -107,7 +107,7 @@ func FormationOptions(appName string, formationType string) *widgets.List {
 	return options
 }
 
-func UpdateFormation(selectedFormation string, quantity int) *widgets.Paragraph {
+func UpdateFormationQuantity(selectedFormation string, quantity int) *widgets.Paragraph {
 
 	selectedFormationSplit := strings.Split(selectedFormation, " / ")
 
@@ -118,7 +118,32 @@ func UpdateFormation(selectedFormation string, quantity int) *widgets.Paragraph 
 
 	infoScreen := widgets.NewParagraph()
 
-	formationUpdateResp, err := core.UpdateFormation(appName, formationType, quantity)
+	formationUpdateResp, err := core.UpdateFormationQuantity(appName, formationType, quantity)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	infoScreen.Text = string(formationUpdateResp)
+
+	infoScreen.SetRect(40, 5, x, y)
+
+	return infoScreen
+
+}
+
+func UpdateFormationSize(selectedFormation string, size string) *widgets.Paragraph {
+
+	selectedFormationSplit := strings.Split(selectedFormation, " / ")
+
+	appName := selectedFormationSplit[0]
+	formationType := selectedFormationSplit[1]
+
+	x, y := termui.TerminalDimensions()
+
+	infoScreen := widgets.NewParagraph()
+
+	formationUpdateResp, err := core.UpdateFormationSize(appName, formationType, size)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

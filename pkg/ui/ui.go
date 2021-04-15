@@ -248,7 +248,7 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 		case "scaleFormation":
 			quantity, _ := strconv.Atoi(selectedItem)
-			screen.Display = UpdateFormation(screen.UIList.Title, quantity)
+			screen.Display = UpdateFormationQuantity(screen.UIList.Title, quantity)
 			screen.Display.Title = fmt.Sprintf("%v : Scale to %v", screen.UIList.Title, selectedItem)
 			screen.UIList.Rows = []string{"<---- Return", " ---- Home ---- "}
 			screen.UIList.ScrollTop()
