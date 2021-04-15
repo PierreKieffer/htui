@@ -64,13 +64,13 @@ func AppOptions(appName string, withoutReturn ...bool) *widgets.List {
 	options.Title = appName
 
 	if len(withoutReturn) > 0 {
-		options.Rows = []string{"App info", "Dynos formation", "Logs"}
+		options.Rows = []string{"App info", "Dynos formations", "Logs"}
 		utils := []string{" ---- Home ---- "}
 		options.Rows = append(options.Rows, utils...)
 		return options
 	}
 
-	options.Rows = []string{"App info", "Dynos formation", "Logs"}
+	options.Rows = []string{"App info", "Dynos formations", "Logs"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
 	return options
@@ -101,7 +101,7 @@ func AppFormation(appName string) *widgets.List {
 func FormationOptions(appName string, formationType string) *widgets.List {
 	options := widgets.NewList()
 	options.Title = fmt.Sprintf("%v / %v", appName, formationType)
-	options.Rows = []string{"Dynos formation info", "Scale"}
+	options.Rows = []string{"Dynos formation info", "Scale dynos formation"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
 	return options
@@ -134,7 +134,14 @@ func FormationInfo(selectedFormation string) *widgets.Paragraph {
 	infoScreen.SetRect(40, 5, x, y)
 
 	return infoScreen
+}
 
+func FormationScalingOptions(selectedFormation string) *widgets.List {
+	options := widgets.NewList()
+	options.Rows = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
+	utils := []string{"<---- Return", " ---- Home ---- "}
+	options.Rows = append(options.Rows, utils...)
+	return options
 }
 
 func DynoOptions(appName string, dynoName string) *widgets.List {

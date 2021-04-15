@@ -57,28 +57,12 @@ func (screen *BaseScreen) Update() {
 	} else {
 
 		switch screen.Screen {
-		case "restartDyno":
-			for cache.DynoState == "starting" {
-				dynoState, display := RestartSelectedDyno(screen.UIList.Title)
-				screen.Display = display
-				screen.Display.Title = fmt.Sprintf("Restart dyno %v", screen.UIList.Title)
-				screen.Screen = "restartDyno"
-				cache.DynoState = dynoState
-
-				termui.Render(d)
-			}
-
-			ls.SetRect(0, 10, 40, y)
-			d.SetRect(40, 10, x, y)
-
-			termui.Render(ls, d)
 		default:
 			ls.SetRect(0, 10, 40, y)
 			d.SetRect(40, 10, x, y)
 
 			termui.Render(ls, d)
 		}
-
 	}
 }
 
@@ -208,7 +192,7 @@ func (screen *BaseScreen) HandleSelectItem() {
 	/*
 		Dynos
 	*/
-	case "Dynos formation":
+	case "Dynos formations":
 		var previousScreen BaseScreen
 		previousScreen = *screen
 
@@ -222,6 +206,16 @@ func (screen *BaseScreen) HandleSelectItem() {
 		screen.Display = FormationInfo(screen.UIList.Title)
 		screen.Screen = "formationInfo"
 		screen.Display.Title = "Dynos formation info"
+
+	case "Scale dynos formation":
+		var previousScreen BaseScreen
+		previousScreen = *screen
+
+		screen.Screen = "scaleFormation"
+		screen.Display = nil
+		items := FormationScalingOptions(screen.UIList.Title)
+		screen.UIList = items
+		screen.Previous = &previousScreen
 
 	case "Restart":
 		dynoState, display := RestartSelectedDyno(screen.UIList.Title)
