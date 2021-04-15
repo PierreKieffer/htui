@@ -218,6 +218,16 @@ func (screen *BaseScreen) HandleSelectItem() {
 		screen.UIList = items
 		screen.Previous = &previousScreen
 
+	case "Update dynos size":
+		var previousScreen BaseScreen
+		previousScreen = *screen
+
+		screen.Screen = "updateDynosType"
+		screen.Display = nil
+		items := DynoSizesOptions(screen.UIList.Title)
+		screen.UIList = items
+		screen.Previous = &previousScreen
+
 	case "Restart":
 		dynoState, display := RestartSelectedDyno(screen.UIList.Title)
 		screen.Display = display
@@ -250,6 +260,14 @@ func (screen *BaseScreen) HandleSelectItem() {
 			quantity, _ := strconv.Atoi(selectedItem)
 			screen.Display = UpdateFormationQuantity(screen.UIList.Title, quantity)
 			screen.Display.Title = fmt.Sprintf("%v : Scale to %v", screen.UIList.Title, selectedItem)
+			screen.UIList.Rows = []string{"<---- Return", " ---- Home ---- "}
+			screen.UIList.ScrollTop()
+
+			screen.Previous.Display = nil
+
+		case "updateDynosType":
+			screen.Display = UpdateFormationSize(screen.UIList.Title, selectedItem)
+			screen.Display.Title = fmt.Sprintf("%v : Update size to %v", screen.UIList.Title, selectedItem)
 			screen.UIList.Rows = []string{"<---- Return", " ---- Home ---- "}
 			screen.UIList.ScrollTop()
 

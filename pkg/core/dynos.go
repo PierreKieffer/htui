@@ -133,7 +133,7 @@ func UpdateFormationSize(appName string, formationType string, size string) (str
 
 	updateFormationUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/formation", appName)
 
-	payload := fmt.Sprintf(`{"updates" : [{"size" : %v,"type" : "%v"}]}`, size, formationType)
+	payload := fmt.Sprintf(`{"updates" : [{"size" : "%v","type" : "%v"}]}`, size, formationType)
 
 	resp, err := api.PatchRequest(updateFormationUrl, payload)
 

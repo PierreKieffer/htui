@@ -101,7 +101,7 @@ func AppFormation(appName string) *widgets.List {
 func FormationOptions(appName string, formationType string) *widgets.List {
 	options := widgets.NewList()
 	options.Title = fmt.Sprintf("%v / %v", appName, formationType)
-	options.Rows = []string{"Dynos formation info", "Scale dynos formation"}
+	options.Rows = []string{"Dynos formation info", "Scale dynos formation", "Update dynos size"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
 	return options
@@ -190,6 +190,15 @@ func FormationScalingOptions(selectedFormation string) *widgets.List {
 	options := widgets.NewList()
 	options.Title = selectedFormation
 	options.Rows = []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
+	utils := []string{"<---- Return", " ---- Home ---- "}
+	options.Rows = append(options.Rows, utils...)
+	return options
+}
+
+func DynoSizesOptions(selectedFormation string) *widgets.List {
+	options := widgets.NewList()
+	options.Title = selectedFormation
+	options.Rows = []string{"free", "hobby", "standard-1x", "standard-2x", "performance-m", "performance-l"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
 	return options
