@@ -15,7 +15,7 @@ func BuildHeader() *widgets.Paragraph {
 	// header.TextStyle.Fg = termui.ColorMagenta
 	header.Text = `
   _   _        _ 
- | |_| |_ _  _(_)
+ | |_| |_ _  _(_)                 
  | ' \  _| || | |
  |_||_\__|\_,_|_|
 
@@ -214,6 +214,35 @@ func AppLogs(screen *BaseScreen, cache *CacheStorage, signal chan bool) {
 		}
 	}
 
+}
+
+func Help() *widgets.Paragraph {
+	help := widgets.NewParagraph()
+	help.Text = `
+
+ Heroku Terminal User Interface
+
+ Move around : 
+ 	- go up               ▲  or 'k'
+ 	- go down             ▼  or 'j'
+ 	- go to the top       'gg'
+ 	- go to the bottom    'G'
+ 	- select item         'enter'
+ 	- Quit                'q'
+`
+
+	return help
+}
+
+func HelpList() *widgets.List {
+
+	helpList := widgets.NewList()
+	helpList.Title = "Help"
+
+	utils := []string{" ---- Home ---- "}
+	helpList.Rows = append(helpList.Rows, utils...)
+
+	return helpList
 }
 
 func AppNodes() []*widgets.TreeNode {

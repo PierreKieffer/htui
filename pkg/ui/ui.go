@@ -133,6 +133,19 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 		*screen = *screen.Previous
 
+	case "Help":
+		/*
+			Go to Help page
+		*/
+		var previousScreen BaseScreen
+		previousScreen = *screen
+
+		items := HelpList()
+		screen.Screen = "help"
+		screen.UIList = items
+		screen.Display = Help()
+		screen.Previous = &previousScreen
+
 	/*
 		Apps
 	*/
