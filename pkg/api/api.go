@@ -70,7 +70,41 @@ func PostRequest(endpoint string, payload string) (*Response, error) {
 	resp, err := client.Do(req)
 
 	if err != nil {
-		return &response, errors.New(fmt.Sprintf("ERROR : GetRequest : %v", err.Error()))
+		return &response, errors.New(fmt.Sprintf("ERROR : PostRequest : %v", err.Error()))
+	}
+
+	var body interface{}
+
+	json.NewDecoder(resp.Body).Decode(&body)
+
+	response.StatusCode = resp.StatusCode
+	response.Body = body
+
+	return &response, nil
+}
+
+func DeleteRequest(endpoint string) (*Response, error) {
+	/*
+		http delete request wrapper
+	*/
+
+	var response Response
+
+	client := &http.Client{}
+
+	req, err := http.NewRequest("DELETE", endpoint, nil)
+
+	if err != nil {
+		return &response, errors.New(fmt.Sprintf("ERROR : DeleteRequest : %v", err.Error()))
+	}
+
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return &response, errors.New(fmt.Sprintf("ERROR : DeleteRequest : %v", err.Error()))
 	}
 
 	var body interface{}

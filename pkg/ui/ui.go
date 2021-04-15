@@ -20,6 +20,8 @@ type BaseScreen struct {
 
 type CacheStorage struct {
 	AppName    string
+	DynoName   string
+	DynoState  string
 	LogsBuffer chan string
 }
 
@@ -54,10 +56,28 @@ func (screen *BaseScreen) Update() {
 
 	} else {
 
-		ls.SetRect(0, 10, 40, y)
-		d.SetRect(40, 10, x, y)
+		switch screen.Screen {
+		case "restartDyno":
+			for cache.DynoState == "starting" {
+				dynoState, display := RestartSelectedDyno(screen.UIList.Title)
+				screen.Display = display
+				screen.Display.Title = fmt.Sprintf("Restart dyno %v", screen.UIList.Title)
+				screen.Screen = "restartDyno"
+				cache.DynoState = dynoState
 
-		termui.Render(ls, d)
+				termui.Render(d)
+			}
+
+			ls.SetRect(0, 10, 40, y)
+			d.SetRect(40, 10, x, y)
+
+			termui.Render(ls, d)
+		default:
+			ls.SetRect(0, 10, 40, y)
+			d.SetRect(40, 10, x, y)
+
+			termui.Render(ls, d)
+		}
 
 	}
 }
@@ -202,6 +222,17 @@ func (screen *BaseScreen) HandleSelectItem() {
 		screen.Display = DynoInfo(screen.UIList.Title)
 		screen.Screen = "dynoInfo"
 		screen.Display.Title = "Dyno info"
+
+	case "Restart":
+		dynoState, display := RestartSelectedDyno(screen.UIList.Title)
+		screen.Display = display
+		screen.Screen = "restartDyno"
+		screen.Display.Title = fmt.Sprintf("Restart dyno %v", screen.UIList.Title)
+
+		selectedDynoSplit := strings.Split(screen.UIList.Title, " / ")
+		cache.AppName = selectedDynoSplit[0]
+		cache.DynoName = selectedDynoSplit[1]
+		cache.DynoState = dynoState
 
 	default:
 		var previousScreen BaseScreen

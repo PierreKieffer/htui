@@ -57,3 +57,37 @@ func GetApps() ([]App, error) {
 
 	return apps, errors.New(fmt.Sprintf("ERROR : GetApps : status code %v", resp.StatusCode))
 }
+
+func GetAppInfo(appName string) (App, error) {
+	/*
+	 */
+
+	var app App
+
+	resp, err := api.GetRequest(fmt.Sprintf("https://api.heroku.com/apps/%v", appName))
+
+	if err != nil {
+		return app, errors.New(fmt.Sprintf("ERROR : GetApps : %v", err.Error()))
+	}
+
+	if resp.StatusCode == 200 {
+
+		item := resp.Body.(map[string]interface{})
+		app = App{
+			Id:           ParseItem(item["id"]),
+			CreatedAt:    ParseItem(item["created_at"]),
+			ReleasedAt:   ParseItem(item["released_at"]),
+			UpdatedAt:    ParseItem(item["updated_at"]),
+			Organization: ParseItem(item["organization"]),
+			Team:         ParseItem(item["team"]),
+			WebUrl:       ParseItem(item["web_url"]),
+			Name:         ParseItem(item["name"]),
+			Owner:        ParseItem(item["owner"].(map[string]interface{})["email"]),
+			Region:       ParseItem(item["region"].(map[string]interface{})["name"]),
+		}
+
+		return app, nil
+	}
+
+	return app, errors.New(fmt.Sprintf("ERROR : GetApps : status code %v", resp.StatusCode))
+}

@@ -110,29 +110,22 @@ func AppInfo(appName string) *widgets.Paragraph {
 
 	x, y := termui.TerminalDimensions()
 
-	var info string
 	infoScreen := widgets.NewParagraph()
 
-	apps, err := core.GetApps()
+	app, err := core.GetAppInfo(appName)
 
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	for _, app := range apps {
-		if app.Name == appName {
-			jsonInfo, err := json.MarshalIndent(app, "", "    ")
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			info = string(jsonInfo)
-			break
-		}
+	jsonInfo, err := json.MarshalIndent(app, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	infoScreen.Text = info
+	infoScreen.Text = string(jsonInfo)
 	infoScreen.SetRect(40, 5, x, y)
 
 	return infoScreen
@@ -147,28 +140,21 @@ func DynoInfo(selectedDyno string) *widgets.Paragraph {
 
 	x, y := termui.TerminalDimensions()
 
-	var info string
 	infoScreen := widgets.NewParagraph()
 
-	dynos, err := core.GetAppDynos(appName)
+	dyno, err := core.GetDynoInfo(appName, dynoName)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	for _, dyno := range dynos {
-		if dyno.Name == dynoName {
-			jsonInfo, err := json.MarshalIndent(dyno, "", "    ")
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			info = string(jsonInfo)
-			break
-		}
+	jsonInfo, err := json.MarshalIndent(dyno, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	infoScreen.Text = info
+	infoScreen.Text = string(jsonInfo)
 	infoScreen.SetRect(40, 5, x, y)
 
 	return infoScreen
@@ -228,10 +214,47 @@ func Help() *widgets.Paragraph {
  	- go to the top       'gg'
  	- go to the bottom    'G'
  	- select item         'enter'
- 	- Quit                'q'
+ 	- Quit htui           'q'
 `
 
 	return help
+}
+
+func RestartSelectedDyno(selectedDyno string) (string, *widgets.Paragraph) {
+
+	selectedDynoSplit := strings.Split(selectedDyno, " / ")
+
+	appName := selectedDynoSplit[0]
+	dynoName := selectedDynoSplit[1]
+
+	x, y := termui.TerminalDimensions()
+
+	infoScreen := widgets.NewParagraph()
+
+	err := core.RestartDyno(appName, dynoName)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	dyno, err := core.GetDynoInfo(appName, dynoName)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	dynoState := dyno.State
+
+	jsonInfo, err := json.MarshalIndent(dyno, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	infoScreen.Text = string(jsonInfo)
+	infoScreen.SetRect(40, 5, x, y)
+
+	return dynoState, infoScreen
 }
 
 func HelpList() *widgets.List {
