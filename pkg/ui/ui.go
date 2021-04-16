@@ -59,6 +59,8 @@ func (screen *BaseScreen) Update() {
 
 		switch screen.Screen {
 		default:
+			d.TitleStyle.Fg = termui.ColorYellow
+			ls.TitleStyle.Fg = termui.ColorYellow
 			ls.SetRect(0, 10, 40, y)
 			d.SetRect(40, 10, x, y)
 
@@ -110,10 +112,17 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 		signal <- true
 
-		items := AppOptions(strings.Split(screen.UIList.Title, " - ")[0], true)
+		items, details := AppOptions(strings.Split(screen.UIList.Title, " - ")[0])
 		screen.Screen = "appOptions"
 		screen.UIList = items
-		screen.Previous = nil
+		screen.Display = details
+
+		previousItems := AppList()
+		screen.Previous.Screen = "apps"
+		screen.Previous.UIList = previousItems
+		screen.Previous.Display = nil
+
+		screen.Update()
 		return
 	}
 
@@ -185,7 +194,7 @@ func (screen *BaseScreen) HandleSelectItem() {
 		screen.Screen = "appLogs"
 
 		screen.UIList.Rows = []string{}
-		screen.UIList.Title = fmt.Sprintf("%v - %v", cache.AppName, "Logs | Press enter to return")
+		screen.UIList.Title = fmt.Sprintf("%v - %v", cache.AppName, "Logs | Return : 'enter' | Top : 'gg' | Bottom 'G'")
 		screen.Display = nil
 
 		screen.Previous = &previousScreen
@@ -245,15 +254,17 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 		switch screen.Screen {
 		case "apps":
-			items := AppOptions(selectedItem)
+			items, details := AppOptions(selectedItem)
 			screen.Screen = "appOptions"
 			screen.UIList = items
+			screen.Display = details
 			screen.Previous = &previousScreen
 
 		case "formation":
-			items := FormationOptions(screen.UIList.Title, selectedItem)
+			items, details := FormationOptions(screen.UIList.Title, selectedItem)
 			screen.Screen = "formationOptions"
 			screen.UIList = items
+			screen.Display = details
 			screen.Previous = &previousScreen
 
 		case "scaleFormation":

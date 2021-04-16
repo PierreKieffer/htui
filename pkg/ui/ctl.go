@@ -59,7 +59,20 @@ func AppList() *widgets.List {
 	return appList
 }
 
-func AppOptions(appName string, withoutReturn ...bool) *widgets.List {
+func AppOptions(appName string, withoutReturn ...bool) (*widgets.List, *widgets.Paragraph) {
+
+	details := widgets.NewParagraph()
+	details.Text = `
+
+- App info : Get app details. 
+
+- Dynos formations : Get the formations of processes that should be maintained for an app.
+                     Update the formations to scale processes or change dyno sizes. 
+
+- Logs : Real time logs tailing for an app.
+         Browse through the logs 
+
+`
 	options := widgets.NewList()
 	options.Title = appName
 
@@ -67,13 +80,14 @@ func AppOptions(appName string, withoutReturn ...bool) *widgets.List {
 		options.Rows = []string{"App info", "Dynos formations", "Logs"}
 		utils := []string{" ---- Home ---- "}
 		options.Rows = append(options.Rows, utils...)
-		return options
+		return options, details
 	}
 
 	options.Rows = []string{"App info", "Dynos formations", "Logs"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
-	return options
+
+	return options, details
 }
 
 func AppFormation(appName string) *widgets.List {
@@ -98,13 +112,36 @@ func AppFormation(appName string) *widgets.List {
 	return formationList
 }
 
-func FormationOptions(appName string, formationType string) *widgets.List {
+func FormationOptions(appName string, formationType string) (*widgets.List, *widgets.Paragraph) {
 	options := widgets.NewList()
 	options.Title = fmt.Sprintf("%v / %v", appName, formationType)
 	options.Rows = []string{"Dynos formation info", "Scale dynos formation", "Update dynos size"}
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	options.Rows = append(options.Rows, utils...)
-	return options
+
+	details := widgets.NewParagraph()
+	details.Text = `
+
+  Formation : The formation of processes that should be maintained for an app.
+              Update the formation to scale processes or change dyno sizes. 
+
+- Dynos formation info : Get formation details. 
+
+- Scale dynos formation : Update the number of process to maintain, between 0 to 10. 
+
+- Update dynos size : Update dynos type to support app size : 
+        Dyno Type      Memory (RAM)    CPU Share    Compute    Dedicated    Sleeps
+        --------------------------------------------------------------------------
+        free           512 MB          1x           1x-4x      no           yes
+        hobby          512 MB          1x           1x-4x      no           no
+        standard-1x    512 MB          1x           1x-4x      no           no
+        standard-2x    1024 MB         2x           4x-8x      no           no
+        performance-m  2.5 GB          100%%        12x        yes          no
+        performance-l  14 GB           100%%        50x        yes          no
+
+`
+
+	return options, details
 }
 
 func UpdateFormationQuantity(selectedFormation string, quantity int) *widgets.Paragraph {
