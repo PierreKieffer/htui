@@ -25,11 +25,26 @@ func BuildHeader() *widgets.Paragraph {
 	return header
 }
 
-func HomeList() *widgets.List {
+func Home() (*widgets.List, *widgets.Paragraph) {
 	options := widgets.NewList()
 	options.Title = "Home"
 	options.Rows = []string{"Apps", "Addons", "Help"}
-	return options
+
+	details := widgets.NewParagraph()
+	details.Text = `
+
+     -----------------------------
+     -        Move around        -
+     -----------------------------
+     go up               ▲  or 'k'
+     go down             ▼  or 'j'
+     go to the top       'gg'
+     go to the bottom    'G'
+     select item         'enter'
+     Quit htui           'q'
+
+`
+	return options, details
 }
 
 func AppList() *widgets.List {
@@ -64,12 +79,12 @@ func AppOptions(appName string, withoutReturn ...bool) (*widgets.List, *widgets.
 	details := widgets.NewParagraph()
 	details.Text = `
 
-- App info : Get app details. 
+    App info : Get app details. 
 
-- Dynos formations : Get the formations of processes that should be maintained for an app.
+    Dynos formations : Get the formations of processes that should be maintained for an app.
                      Update the formations to scale processes or change dyno sizes. 
 
-- Logs : Real time logs tailing for an app.
+    Logs : Real time logs tailing for an app.
          Browse through the logs 
 
 `
@@ -122,14 +137,14 @@ func FormationOptions(appName string, formationType string) (*widgets.List, *wid
 	details := widgets.NewParagraph()
 	details.Text = `
 
-  Formation : The formation of processes that should be maintained for an app.
-              Update the formation to scale processes or change dyno sizes. 
+    Formation : The formation of processes that should be maintained for an app.
+                Update the formation to scale processes or change dyno sizes. 
 
-- Dynos formation info : Get formation details. 
+    Dynos formation info : Get formation details. 
 
-- Scale dynos formation : Update the number of process to maintain, between 0 to 10. 
+    Scale dynos formation : Update the number of process to maintain, between 0 to 10. 
 
-- Update dynos size : Update dynos type to support app size : 
+    Update dynos size : Update dynos type to support app size : 
         Dyno Type      Memory (RAM)    CPU Share    Compute    Dedicated    Sleeps
         --------------------------------------------------------------------------
         free           512 MB          1x           1x-4x      no           yes
@@ -370,16 +385,41 @@ func AppLogs(screen *BaseScreen, cache *CacheStorage, signal chan bool) {
 func Help() *widgets.Paragraph {
 	help := widgets.NewParagraph()
 	help.Text = `
+            _   _        _ 
+           | |_| |_ _  _(_)                 
+           | ' \  _| || | |
+           |_||_\__|\_,_|_|
+    
+     Heroku Terminal User Interface
 
- Heroku Terminal User Interface
+     -----------------------------
+     -        Move around        -
+     -----------------------------
+     go up               ▲  or 'k'
+     go down             ▼  or 'j'
+     go to the top       'gg'
+     go to the bottom    'G'
+     select item         'enter'
+     Quit htui           'q'
 
- Move around : 
- 	- go up               ▲  or 'k'
- 	- go down             ▼  or 'j'
- 	- go to the top       'gg'
- 	- go to the bottom    'G'
- 	- select item         'enter'
- 	- Quit htui           'q'
+     -----------------------------
+     -    htui authentication    -
+     -----------------------------
+     htui uses API token mechanism for authentication to Heroku, with HEROKU_API_KEY environment variable. 
+     If ~/.netrc file exists (UNIX), HEROKU_API_KEY is set automatically. 
+     If ~/.netrc doesn't exist, you need to set HEROKU_API_KEY manually : 
+     - Retrieve the API token : 
+     	- heroku CLI : heroku auth:token
+     	- heroku account setting web page : API Key
+     - export HEROKU_API_KEY="api token" 
+
+
+
+
+     -----------------------------
+     -          Author           -
+     -----------------------------
+     https://github.com/PierreKieffer
 `
 
 	return help

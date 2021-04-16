@@ -79,7 +79,9 @@ func (screen *BaseScreen) Create() {
 
 	if screen.UIList == nil {
 		screen.Screen = "home"
-		screen.UIList = HomeList()
+		items, details := Home()
+		screen.UIList = items
+		screen.Display = details
 	}
 
 	// header
@@ -88,20 +90,24 @@ func (screen *BaseScreen) Create() {
 
 	// menu list
 	ls := screen.UIList
-	// ls.TextStyle = termui.NewStyle(termui.ColorYellow)
 	ls.SelectedRowStyle = termui.NewStyle(termui.ColorMagenta)
 	ls.TitleStyle.Fg = termui.ColorYellow
 	ls.WrapText = false
 
 	if screen.Display == nil {
 		ls.SetRect(0, 10, x, y)
+		termui.Render(h, ls)
 
 	} else {
+		d := screen.Display
+		d.TitleStyle.Fg = termui.ColorYellow
+
 		ls.SetRect(0, 10, 40, y)
+		d.SetRect(40, 10, x, y)
+		termui.Render(h, ls, d)
 
 	}
 
-	termui.Render(h, ls)
 }
 
 func (screen *BaseScreen) HandleSelectItem() {
@@ -134,11 +140,11 @@ func (screen *BaseScreen) HandleSelectItem() {
 			Return to Home page
 		*/
 
-		items := HomeList()
+		items, details := Home()
 		screen.Screen = "home"
 		screen.UIList = items
+		screen.Display = details
 		screen.Previous = nil
-		screen.Display = nil
 
 	case "<---- Return":
 		/*
