@@ -12,7 +12,6 @@ import (
 
 func BuildHeader() *widgets.Paragraph {
 	header := widgets.NewParagraph()
-	// header.TextStyle.Fg = termui.ColorMagenta
 	header.Text = `
   _   _        _ 
  | |_| |_ _  _(_)                 
