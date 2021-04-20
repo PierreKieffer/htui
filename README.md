@@ -49,6 +49,15 @@ htui
      Quit htui           'q'
 ```
 
+## Authentication 
+htui uses API token mechanism for authentication to Heroku, with `HEROKU_API_KEY` environment variable. 
+If `~/.netrc` file exists (UNIX), `HEROKU_API_KEY` is set automatically. 
+If `~/.netrc` doesn't exist, you need to set `HEROKU_API_KEY` manually : 
+- Retrieve the API token : 
+  - heroku CLI : `heroku auth:token`
+  - heroku account setting web page : API Key
+- `export HEROKU_API_KEY="api token"` 
+
 
 ## Built With
 
