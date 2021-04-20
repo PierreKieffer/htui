@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/PierreKieffer/htui/pkg/pkg/api"
+	"net/http"
+	"os"
 )
 
 type Dyno struct {
@@ -37,33 +39,27 @@ func GetAppFormation(appName string) ([]Formation, error) {
 	 */
 	var formations []Formation
 
-	dynosListUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/formation", appName)
+	formationsListUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/formation", appName)
 
-	resp, err := api.GetRequest(dynosListUrl)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", formationsListUrl, nil)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("ERROR : GetAppFormation : %v", err.Error()))
+	}
 
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("ERROR : GetAppFormation : %v", err.Error()))
 	}
 
 	if resp.StatusCode == 200 {
 
-		for _, rawItem := range resp.Body.([]interface{}) {
-			item := rawItem.(map[string]interface{})
-			formation := Formation{
-				Id:        ParseItem(item["id"]),
-				CreatedAt: ParseItem(item["created_at"]),
-				UpdatedAt: ParseItem(item["updated_at"]),
-				Command:   ParseItem(item["command"]),
-				Size:      ParseItem(item["size"]),
-				Quantity:  item["quantity"].(float64),
-				Type:      ParseItem(item["type"]),
-			}
-
-			formation.App.Name = ParseItem(item["app"].(map[string]interface{})["name"])
-			formation.App.Id = ParseItem(item["app"].(map[string]interface{})["id"])
-
-			formations = append(formations, formation)
-
+		err := json.NewDecoder(resp.Body).Decode(&formations)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("ERROR : GetAppFormation : %v", err.Error()))
 		}
 
 		return formations, nil
@@ -77,27 +73,25 @@ func GetFormationInfo(appName string, formationType string) (Formation, error) {
 
 	formationUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/formation/%v", appName, formationType)
 
-	resp, err := api.GetRequest(formationUrl)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", formationUrl, nil)
+	if err != nil {
+		return formation, errors.New(fmt.Sprintf("ERROR : GetFormationInfo : %v", err.Error()))
+	}
 
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return formation, errors.New(fmt.Sprintf("ERROR : GetFormationInfo : %v", err.Error()))
 	}
 
 	if resp.StatusCode == 200 {
-
-		item := resp.Body.(map[string]interface{})
-		formation := Formation{
-			Id:        ParseItem(item["id"]),
-			CreatedAt: ParseItem(item["created_at"]),
-			UpdatedAt: ParseItem(item["updated_at"]),
-			Command:   ParseItem(item["command"]),
-			Size:      ParseItem(item["size"]),
-			Quantity:  item["quantity"].(float64),
-			Type:      ParseItem(item["type"]),
+		err := json.NewDecoder(resp.Body).Decode(&formation)
+		if err != nil {
+			return formation, errors.New(fmt.Sprintf("ERROR : GetFormationInfo : %v", err.Error()))
 		}
-
-		formation.App.Name = ParseItem(item["app"].(map[string]interface{})["name"])
-		formation.App.Id = ParseItem(item["app"].(map[string]interface{})["id"])
 
 		return formation, nil
 	}
@@ -160,29 +154,23 @@ func GetAppDynos(appName string) ([]Dyno, error) {
 
 	dynosListUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/dynos", appName)
 
-	resp, err := api.GetRequest(dynosListUrl)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", dynosListUrl, nil)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("ERROR : GetAppDynos : %v", err.Error()))
+	}
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
 
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("ERROR : GetAppDynos : %v", err.Error()))
 	}
 
 	if resp.StatusCode == 200 {
-
-		for _, rawItem := range resp.Body.([]interface{}) {
-			item := rawItem.(map[string]interface{})
-			dyno := Dyno{
-				Id:        ParseItem(item["id"]),
-				CreatedAt: ParseItem(item["created_at"]),
-				UpdatedAt: ParseItem(item["updated_at"]),
-				Command:   ParseItem(item["command"]),
-				Name:      ParseItem(item["name"]),
-				Size:      ParseItem(item["size"]),
-				State:     ParseItem(item["state"]),
-				Type:      ParseItem(item["type"]),
-			}
-
-			dynos = append(dynos, dyno)
-
+		err := json.NewDecoder(resp.Body).Decode(&dynos)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("ERROR : GetAppDynos : %v", err.Error()))
 		}
 
 		return dynos, nil
@@ -217,31 +205,30 @@ func GetDynoInfo(appName string, dynoName string) (Dyno, error) {
 
 	dynoInfoUrl := fmt.Sprintf("https://api.heroku.com/apps/%v/dynos/%v", appName, dynoName)
 
-	resp, err := api.GetRequest(dynoInfoUrl)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", dynoInfoUrl, nil)
+	if err != nil {
+		return dyno, errors.New(fmt.Sprintf("ERROR : GetDynoInfo : %v", err.Error()))
+	}
 
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
+
+	resp, err := client.Do(req)
 	if err != nil {
 		return dyno, errors.New(fmt.Sprintf("ERROR : GetDynoInfo : %v", err.Error()))
 	}
 
 	if resp.StatusCode == 200 {
-
-		item := resp.Body.(map[string]interface{})
-		dyno := Dyno{
-			Id:        ParseItem(item["id"]),
-			CreatedAt: ParseItem(item["created_at"]),
-			UpdatedAt: ParseItem(item["updated_at"]),
-			Command:   ParseItem(item["command"]),
-			Name:      ParseItem(item["name"]),
-			Size:      ParseItem(item["size"]),
-			State:     ParseItem(item["state"]),
-			Type:      ParseItem(item["type"]),
+		err := json.NewDecoder(resp.Body).Decode(&dyno)
+		if err != nil {
+			return dyno, errors.New(fmt.Sprintf("ERROR : GetDynoInfo : %v", err.Error()))
 		}
 
 		return dyno, nil
 	}
 
 	return dyno, errors.New(fmt.Sprintf("ERROR : GetDynoInfo : status code %v", resp.StatusCode))
-
 }
 
 func GetDynoState(appName string, dynoName string) (string, error) {
