@@ -1,22 +1,57 @@
 package core
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/PierreKieffer/htui/pkg/pkg/api"
+	"net/http"
+	"os"
 )
 
 type App struct {
-	Id           string `json:"id"`
-	CreatedAt    string `json:"createdAt"`
-	ReleasedAt   string `json:"releasedAt"`
-	UpdatedAt    string `json:"updatedAt"`
-	Organization string `json:"organization"`
-	Team         string `json:"team"`
-	WebUrl       string `json:"webUrl"`
-	Name         string `json:"name"`
-	Owner        string `json:"owner"`
-	Region       string `json:"region"`
+	Acm                          bool   `json:"acm"`
+	ArchivedAt                   string `json:"archived_at"`
+	BuildpackProvidedDescription string `json:"buildpack_provided_description"`
+	BuildStack                   struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"build_stack"`
+	CreatedAt       string `json:"created_at"`
+	GitURL          string `json:"git_url"`
+	ID              string `json:"id"`
+	InternalRouting bool   `json:"internal_routing"`
+	Maintenance     bool   `json:"maintenance"`
+	Name            string `json:"name"`
+	Owner           struct {
+		Email string `json:"email"`
+		ID    string `json:"id"`
+	} `json:"owner"`
+	Organization struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"organization"`
+	Team struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"team"`
+	Region struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"region"`
+	ReleasedAt string `json:"released_at"`
+	RepoSize   int    `json:"repo_size"`
+	SlugSize   int    `json:"slug_size"`
+	Space      struct {
+		ID     string `json:"id"`
+		Name   string `json:"name"`
+		Shield bool   `json:"shield"`
+	} `json:"space"`
+	Stack struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"stack"`
+	UpdatedAt string `json:"updated_at"`
+	WebURL    string `json:"web_url"`
 }
 
 func GetApps() ([]App, error) {
@@ -25,31 +60,23 @@ func GetApps() ([]App, error) {
 
 	var apps []App
 
-	resp, err := api.GetRequest("https://api.heroku.com/apps")
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://api.heroku.com/apps", nil)
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("ERROR : GetApps : %v", err.Error()))
+	}
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
 
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("ERROR : GetApps : %v", err.Error()))
 	}
 
 	if resp.StatusCode == 200 {
-
-		for _, rawItem := range resp.Body.([]interface{}) {
-			item := rawItem.(map[string]interface{})
-			app := App{
-				Id:           ParseItem(item["id"]),
-				CreatedAt:    ParseItem(item["created_at"]),
-				ReleasedAt:   ParseItem(item["released_at"]),
-				UpdatedAt:    ParseItem(item["updated_at"]),
-				Organization: ParseItem(item["organization"]),
-				Team:         ParseItem(item["team"]),
-				WebUrl:       ParseItem(item["web_url"]),
-				Name:         ParseItem(item["name"]),
-				Owner:        ParseItem(item["owner"].(map[string]interface{})["email"]),
-				Region:       ParseItem(item["region"].(map[string]interface{})["name"]),
-			}
-
-			apps = append(apps, app)
-
+		err := json.NewDecoder(resp.Body).Decode(&apps)
+		if err != nil {
+			return nil, errors.New(fmt.Sprintf("ERROR : GetApps : %v", err.Error()))
 		}
 
 		return apps, nil
@@ -64,30 +91,29 @@ func GetAppInfo(appName string) (App, error) {
 
 	var app App
 
-	resp, err := api.GetRequest(fmt.Sprintf("https://api.heroku.com/apps/%v", appName))
-
+	appInfoUrl := fmt.Sprintf("https://api.heroku.com/apps/%v", appName)
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", appInfoUrl, nil)
 	if err != nil {
-		return app, errors.New(fmt.Sprintf("ERROR : GetApps : %v", err.Error()))
+		return app, errors.New(fmt.Sprintf("ERROR : GetAppInfo : %v", err.Error()))
+	}
+
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return app, errors.New(fmt.Sprintf("ERROR : GetAppInfo : %v", err.Error()))
 	}
 
 	if resp.StatusCode == 200 {
-
-		item := resp.Body.(map[string]interface{})
-		app = App{
-			Id:           ParseItem(item["id"]),
-			CreatedAt:    ParseItem(item["created_at"]),
-			ReleasedAt:   ParseItem(item["released_at"]),
-			UpdatedAt:    ParseItem(item["updated_at"]),
-			Organization: ParseItem(item["organization"]),
-			Team:         ParseItem(item["team"]),
-			WebUrl:       ParseItem(item["web_url"]),
-			Name:         ParseItem(item["name"]),
-			Owner:        ParseItem(item["owner"].(map[string]interface{})["email"]),
-			Region:       ParseItem(item["region"].(map[string]interface{})["name"]),
+		err := json.NewDecoder(resp.Body).Decode(&app)
+		if err != nil {
+			return app, errors.New(fmt.Sprintf("ERROR : GetAppInfo : %v", err.Error()))
 		}
 
 		return app, nil
 	}
 
-	return app, errors.New(fmt.Sprintf("ERROR : GetApps : status code %v", resp.StatusCode))
+	return app, errors.New(fmt.Sprintf("ERROR : GetAppInfo : status code %v", resp.StatusCode))
 }
