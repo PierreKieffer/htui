@@ -3,8 +3,8 @@ package main
 import (
 	// "context"
 	"fmt"
-	"github.com/PierreKieffer/htui/pkg/pkg/auth"
-	"github.com/PierreKieffer/htui/pkg/pkg/ui"
+	"github.com/PierreKieffer/htui/pkg/auth"
+	"github.com/PierreKieffer/htui/pkg/ui"
 	"os"
 )
 

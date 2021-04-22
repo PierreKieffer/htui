@@ -3,7 +3,7 @@ package ui
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/PierreKieffer/htui/pkg/pkg/core"
+	"github.com/PierreKieffer/htui/pkg/core"
 	termui "github.com/gizak/termui/v3"
 	"github.com/gizak/termui/v3/widgets"
 	"os"
@@ -472,54 +472,62 @@ func HelpList() *widgets.List {
 	return helpList
 }
 
-func AppNodes() []*widgets.TreeNode {
+func AddonList() *widgets.List {
 
-	apps, err := core.GetApps()
+	addonsList := widgets.NewList()
+	addonsList.Title = "Addons"
+
+	addons, err := core.GetAddons()
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
-	var appNodes []*widgets.TreeNode
-
-	for _, app := range apps {
-		var appNode widgets.TreeNode
-		appNode.Value = nodeValue(app.Name)
-		appNode.Nodes = BuildAppNodes(app)
-
-		appNodes = append(appNodes, &appNode)
+	for _, addon := range addons {
+		addonsList.Rows = append(addonsList.Rows, addon.Name)
 	}
 
-	return appNodes
+	utils := []string{"<---- Return", " ---- Home ---- "}
+	addonsList.Rows = append(addonsList.Rows, utils...)
+
+	return addonsList
 }
 
-func BuildAppNodes(app core.App) []*widgets.TreeNode {
+func AddonOptions(addonName string) (*widgets.List, *widgets.Paragraph) {
 
-	var nodes []*widgets.TreeNode
+	details := widgets.NewParagraph()
+	details.Text = ""
+	options := widgets.NewList()
+	options.Title = addonName
 
-	var infoNode widgets.TreeNode
-	infoNode.Value = nodeValue("info")
-	infoNode.Nodes = nil
+	options.Rows = []string{"Addon info"}
+	utils := []string{"<---- Return", " ---- Home ---- "}
+	options.Rows = append(options.Rows, utils...)
 
-	nodes = append(nodes, &infoNode)
-
-	var dynosNode widgets.TreeNode
-	dynosNode.Value = nodeValue("dynos")
-	dynosNode.Nodes = nil
-
-	nodes = append(nodes, &dynosNode)
-
-	var logsNode widgets.TreeNode
-	logsNode.Value = nodeValue("logs")
-	logsNode.Nodes = nil
-
-	nodes = append(nodes, &logsNode)
-
-	return nodes
+	return options, details
 }
 
-type nodeValue string
+func AddonInfo(addonName string) *widgets.Paragraph {
 
-func (value nodeValue) String() string {
-	return string(value)
+	x, y := termui.TerminalDimensions()
+
+	infoScreen := widgets.NewParagraph()
+
+	app, err := core.GetAddonInfo(addonName)
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	jsonInfo, err := json.MarshalIndent(app, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	infoScreen.Text = string(jsonInfo)
+	infoScreen.SetRect(40, 5, x, y)
+
+	return infoScreen
 }

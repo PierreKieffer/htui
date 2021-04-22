@@ -26,9 +26,13 @@
 **Note**: Prebuilt binaries for 64-bit operating systems, doesn't require Go.
 
 ### 64-bit
-
+#### Linux 
 ```bash 
 curl -sSL https://raw.githubusercontent.com/PierreKieffer/htui/master/install/install_htui64.sh | bash
+```
+#### Mac OS 
+```bash 
+curl -sSL https://raw.githubusercontent.com/PierreKieffer/htui/master/install/install_htui64_osx.sh | bash
 ```
 
 ## Run 

@@ -3,7 +3,7 @@ package core
 import (
 	"errors"
 	"fmt"
-	"github.com/PierreKieffer/htui/pkg/pkg/api"
+	"github.com/PierreKieffer/htui/pkg/api"
 )
 
 func StreamLogs(appName string, logsBuffer chan string, signal chan bool) error {

@@ -254,6 +254,28 @@ func (screen *BaseScreen) HandleSelectItem() {
 		cache.DynoName = selectedDynoSplit[1]
 		cache.DynoState = dynoState
 
+	/*
+		Addons
+	*/
+	case "Addons":
+		var previousScreen BaseScreen
+		previousScreen = *screen
+
+		items := AddonList()
+		screen.Screen = "addons"
+		screen.UIList = items
+		screen.Previous = &previousScreen
+		screen.Display = nil
+
+	case "Addon info":
+		var previousScreen BaseScreen
+		previousScreen = *screen
+
+		screen.Display = AddonInfo(screen.UIList.Title)
+		screen.Screen = "addonInfo"
+		screen.Display.Title = "Addon info"
+		screen.Previous = &previousScreen
+
 	default:
 		var previousScreen BaseScreen
 		previousScreen = *screen
@@ -290,6 +312,12 @@ func (screen *BaseScreen) HandleSelectItem() {
 
 			screen.Previous.Display = nil
 
+		case "addons":
+			items, _ := AddonOptions(selectedItem)
+			screen.Screen = "addonOptions"
+			screen.UIList = items
+			screen.Display = nil
+			screen.Previous = &previousScreen
 		}
 
 	}

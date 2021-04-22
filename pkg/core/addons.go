@@ -14,7 +14,10 @@ import (
 // if err != nil {
 // fmt.Println(err)
 // }
-// fmt.Println(a)
+// for _, ad := range a {
+// fmt.Println(ad.App)
+// }
+
 // }
 
 type Addon struct {
@@ -90,6 +93,36 @@ func GetAddons() ([]Addon, error) {
 
 }
 
-// func GetAddonInfo() (Addon, error) {
+func GetAddonInfo(addonName string) (Addon, error) {
+	var addon Addon
 
-// }
+	client := &http.Client{}
+
+	addonInfoUrl := fmt.Sprintf("https://api.heroku.com/addons/%v", addonName)
+	req, err := http.NewRequest("GET", addonInfoUrl, nil)
+
+	if err != nil {
+		return addon, errors.New(fmt.Sprintf("ERROR : GetAddonInfo : %v", err.Error()))
+	}
+
+	req.Header.Set("Accept", "application/vnd.heroku+json; version=3")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", os.Getenv("HEROKU_API_KEY")))
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return addon, errors.New(fmt.Sprintf("ERROR : GetAddonInfo : %v", err.Error()))
+	}
+
+	if resp.StatusCode == 200 {
+
+		err := json.NewDecoder(resp.Body).Decode(&addon)
+		if err != nil {
+			return addon, errors.New(fmt.Sprintf("ERROR : GetAddonInfo : %v", err.Error()))
+		}
+
+		return addon, nil
+	}
+
+	return addon, errors.New(fmt.Sprintf("ERROR : GetAddonInfo : status code %v", resp.StatusCode))
+
+}

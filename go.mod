@@ -1,4 +1,4 @@
-module github.com/PierreKieffer/htui/pkg
+module github.com/PierreKieffer/htui
 
 go 1.14
 

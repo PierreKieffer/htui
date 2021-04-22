@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/PierreKieffer/htui/pkg/pkg/api"
+	"github.com/PierreKieffer/htui/pkg/api"
 	"net/http"
 	"os"
 )
