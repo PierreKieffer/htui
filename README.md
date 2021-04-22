@@ -12,7 +12,7 @@
 **Heroku Terminal User Interface**
 
 
-<!-- <img src="" /> -->
+<img src="./assets/htui_demo.gif" />
 
 
 </div>

@@ -64,11 +64,11 @@ func AppList() *widgets.List {
 	utils := []string{"<---- Return", " ---- Home ---- "}
 	appList.Rows = append(appList.Rows, utils...)
 
-	///////// DEMO
+	// ///////// DEMO
 	// demo_slice := []string{"db-system-api-production", "db-system-api-staging", "load-balancer-production", "load-balancer-staging", "sync-worker-production", "sync-worker-staging"}
 	// appList.Rows = demo_slice
 	// appList.Rows = append(appList.Rows, utils...)
-	///////// DEMO
+	// ///////// DEMO
 
 	return appList
 }
