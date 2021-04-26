@@ -29,7 +29,7 @@ Manage your apps, scale your dynos, browse logs in real time ...
 ### 64-bit
 #### Linux 
 ```bash 
-curl -sSL https://raw.githubusercontent.com/PierreKieffer/htui/master/install/install_htui64.sh | bash
+curl -sSL https://raw.githubusercontent.com/PierreKieffer/htui/master/install/install_htui64_linux.sh | bash
 ```
 #### Mac OS 
 ```bash 
