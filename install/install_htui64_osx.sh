@@ -1,6 +1,6 @@
 #!/bin/bash
 echo " ---------- Downloading htui ---------- "
-wget https://github.com/PierreKieffer/htui/raw/master/bin/64_osx/htui
+curl https://github.com/PierreKieffer/htui/raw/master/bin/64_osx/htui -o htui
 chmod +x htui
 sudo mv htui /usr/local/bin
 echo " ---------- htui is installed ---------- "
