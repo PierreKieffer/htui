@@ -11,6 +11,8 @@
 
 **Heroku Terminal User Interface**
 
+Manage your apps, scale your dynos, browse logs in real time ... 
+
 
 <img src="./assets/htui_demo.gif" />
 
@@ -18,7 +20,6 @@
 </div>
 
 ---
-
 
 
 ## Install 
@@ -62,6 +63,14 @@ If `~/.netrc` doesn't exist, you need to set `HEROKU_API_KEY` manually :
   - heroku account setting web page : API Key
 - `export HEROKU_API_KEY="api token"` 
 
+## Build 
+```bash 
+git clone https://github.com/PierreKieffer/htui
+```
+
+```bash 
+go build
+```
 
 ## Built With
 
