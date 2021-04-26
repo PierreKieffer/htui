@@ -8,18 +8,6 @@ import (
 	"os"
 )
 
-// func main() {
-// os.Setenv("HEROKU_API_KEY", "c2a4c82f-2b5b-419d-a86b-05070e87d41a")
-// a, err := GetAddons()
-// if err != nil {
-// fmt.Println(err)
-// }
-// for _, ad := range a {
-// fmt.Println(ad.App)
-// }
-
-// }
-
 type Addon struct {
 	ID         string        `json:"id"`
 	CreatedAt  string        `json:"created_at"`

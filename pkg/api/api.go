@@ -189,14 +189,3 @@ func StreamRequest(endpoint string, buffer chan string, apiSignal chan bool) err
 		buffer <- string(line)
 	}
 }
-
-// func main() {
-// os.Setenv("HEROKU_API_KEY", "00a2fdf8-66c8-4925-b55e-d87fd79bc803")
-
-// resp, err := GetRequest("https://api.heroku.com/apps")
-// if err != nil {
-// fmt.Println(err)
-// }
-
-// fmt.Println(*resp)
-// }
